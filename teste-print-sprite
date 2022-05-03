@@ -1,0 +1,35 @@
+.data
+	.include "./sprites/richard/walk_1.data"
+.text
+	li s10, 150
+	li s11, 260
+
+	la a0, walk_1			# a0 endereço da imagem
+	lw t0, 0(a0)			# numero de colunas
+	lw t1, 4(a0)			# numero de linhas
+	mul a2, t0, t1			# tamanho imagem
+	
+	li t1, 0x140
+	mul t1, t1, s10		# multiplica 0x140 por linha
+	add t1, t1, s11		# soma coluna ao valor de cima
+	li a1, 0xff000000
+	add a1, t1, a1			# soma o valor de cima ao endereço da tela, endereço onde será printado sprite
+	li t1, 0				# contador 1
+	li t2, 0				# contador 2
+	addi a0, a0, 8
+LOOP:
+	beq t1, a2, DONE		# se o contador 1 for igual ao tamanho da img vai para DONE
+	lw t3, 0(a0)			# carrega a word da imagem
+	sw t3, 0(a1)			# coloca word no endereço calculado acima
+	addi a0, a0, 4
+	addi a1, a1, 4
+	addi t1, t1, 4
+	addi t2, t2, 4
+	blt t2, t0, LOOP		# verifica se t2 esta do tamanho da largura da img
+	li t2, 0x140			# 0x140 equivale a uma linha no bitmap display
+	sub t2, t2, t0			# subtrai 0x140-colunas para alinhamento
+	add a1, a1, t2			# soma t2 ao endereço do bitmap
+	li t2, 0				# zera o contador2
+	j LOOP
+DONE:
+	

@@ -280,6 +280,32 @@ DONE:
 .end_macro
 
 
+.macro VICTORY()
+.data
+	# Tamanho:76
+	NOTAS: .word 72,667,72,166,67,166,74,166,76,1167,76,166,77,166,79,833,81,333,79,166,77,333,76,333,74,333,72,166,74,166,76,333,76,166,77,166,79,2334,72,166,74,166,76,166,77,166,76,1667,72,667,72,166,67,166,72,166,79,1167,79,166,81,166,83,833,84,333,83,166,81,333,79,333,77,333,74,166,72,166,76,333,76,166,77,166,79,2334,84,166,86,166,88,2001,89,2334,88,166,86,166,84,2001,83,166,84,166,86,166,83,166,84,333,79,2668,74,166,76,166,77,333,76,1667,79,2334,81,166,83,166,84,2001,86,166,88,166,89,166,86,166,87,333,84,1667,77,166,79,166,83,166,79,166,84,333,79,2334
+.text
+	FRAME(0)
+	PRINT_FULL_IMG_0("./sprites/background/bg-victory.bin")
+	
+	li s1, 76			# define o endereço do número de notas e le o numero de notas
+	la s0, NOTAS		# define o endereço das notas
+	li t0, 0			# zera o contador de notas
+	li a2, 45			# define o instrumento
+	li a3, 127			# define o volume
+
+LOOP:	beq t0, s1, EXIT
+		PRINT_FULL_IMG_1("./sprites/background/bg-victory.bin")
+		lw a0, 0(s0)
+		lw a1, 4(s0)
+		SYSCALL(MIDI)
+		addi s0, s0, 8
+		addi t0, t0, 1
+		j LOOP
+		
+EXIT:
+.end_macro
+
 
 .macro DEFEAT()
 .data
@@ -337,11 +363,8 @@ EXIT:
 	add s9, s9, %pixel	# Salva o endereço do pixel na hitbox
 	
 	lb t4, 0(s9)		# Pega o pixel	
-	
-	# mv t6, t4
-	
+
 	li t5, RED		
-	#slti t4, t4, RED	
 	bne t4, t5, EXIT	# Se o pixel for vermelho, então chama a macro de diminuir vida.
 	
 	DECREASE_LIFE()
@@ -350,55 +373,34 @@ EXIT:
 .end_macro
 
 
-# ESPINHOS ------------------------------------------------------------ #
-# posição espinhos
-.eqv coluna_espinhos1 138 #184-42
-.eqv coluna_espinhos2 184
+.macro check_win(%last.pixel)
+	li t4, 280
+	blt %last.pixel, t4, EXIT
+	VICTORY()
 
-.macro colisao_espinhos(%char_column)
-	mv t2 %char_column
-#CONDICAO1:
-	li t0 coluna_espinhos1
-	bge t2 t0 CONDICAO2
-	j EXIT
-	
-CONDICAO2:
-	li t0 coluna_espinhos2
-	ble t2 t0 COLISAO
-	j EXIT
-COLISAO:
-	addi s7 s7 -1
 EXIT:
 .end_macro
 
-# BURACO ------------------------------------------------------------ #
-# posição buraco
-.eqv coluna_buraco1 230 #272-42
-.eqv coluna_buraco2 272 
 
-.macro colisao_buraco(%char_column)
-	mv t2 %char_column
-#CONDICAO1:
-	li t0 coluna_buraco1
-	bge t2 t0 CONDICAO2
-	j EXIT
-	
-CONDICAO2:
-	li t0 coluna_buraco2
-	ble t2 t0 COLISAO
-	j EXIT
-COLISAO:
-	addi s7 s7 -1
-EXIT:
+.macro get_next_column(%column, %decremento)
+	add t5, %column, %decremento
 .end_macro
 
-# CHEGOU NO FINAL DA TELA? ------------------------------------------------------------ #
-.macro final_tela(%char_column)
-	li t3 280 #248 + 32
-	mv t4 %char_column
-	bge t4 t3 FINAL
-	j EXIT
-FINAL:
-	li s4 -1
-EXIT:
+
+.macro get_first_pixel(%column, %line)
+	li t4, 320
+	mul t5, %line, t4
+	add t5, t5, %column
+.end_macro
+
+
+.macro get_right_last_pixel(%first.pixel)
+	li t4, 0x000035CD
+	add t5, %first.pixel, t4
+.end_macro
+
+
+.macro get_left_last_pixel(%first.pixel)
+	li t4, 0x000035CF
+	add t5, %first.pixel, t4
 .end_macro

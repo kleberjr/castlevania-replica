@@ -57,9 +57,7 @@
 		li t0 e
 		beq %char t0 J_ACAO_e
 		li t0 d
-		beq %char t0 J_ACAO_d
-		li t0 s
-		beq %char t0 J_ACAO_s	
+		beq %char t0 J_ACAO_d	
 		j EXIT
 
 		J_ACAO_a: j ACAO.a
@@ -67,46 +65,68 @@
 		J_ACAO_w: j ACAO.w	
 		J_ACAO_e: j ACAO.e
 		J_ACAO_d: j ACAO.d
-		J_ACAO_s: j ACAO.s
 
 	
 			
 ACAO.a:	# ANDAR ESQUERDA ------------------------------------------------- #
+	
+	li t4, -4
+	get_next_column(%prev.column, t4)
+	slti t5, t5, 0		# s1 = (pixel < 0) ? 1 : 0
+	bne t5, zero, J_EXIT_a
+		
 	REFRESH(0)
 	addi %prev.column %prev.column -4
 	PRINT_SPRITE_0(%prev.column, %prev.line, walk_1)
 	
-	# colisao_espinhos(%prev.column)
-	# colisao_buraco(%prev.column)
-	# final_tela(%prev.column)
+	li t4, -4
+	get_next_column(%prev.column, t4)
+	slti t5, t5, 0		# s1 = (pixel < 0) ? 1 : 0
+	bne t5, zero, J_EXIT_a
 	
-	REFRESH(1)
+	REFRESH(0)
 	FRAME(0)
 	addi %prev.column %prev.column -4
-	PRINT_SPRITE_1(%prev.column, %prev.line, walk_2)
-
+	PRINT_SPRITE_0(%prev.column, %prev.line, walk_2)
+	
+	li t4, -4
+	get_next_column(%prev.column, t4)
+	slti t5, t5, 0		# s1 = (pixel < 0) ? 1 : 0
+	bne t5, zero, J_EXIT_a
+	
 	REFRESH(0)
-	FRAME(1)
+	FRAME(0)
 	addi %prev.column %prev.column -4
 	PRINT_SPRITE_0(%prev.column, %prev.line, walk_3)
-
-	REFRESH(1)
+	
+	li t4, -4
+	get_next_column(%prev.column, t4)
+	mv t6, t5
+	slti t5, t5, 0		# s1 = (pixel < 0) ? 1 : 0
+	bne t5, zero, J_EXIT_a
+	
+	REFRESH(0)
 	FRAME(0)
 	addi %prev.column %prev.column -4
-	PRINT_SPRITE_1(%prev.column, %prev.line, walk_2)
+	PRINT_SPRITE_0(%prev.column, %prev.line, walk_2)
 	REFRESH(0)
-	FRAME(1)
+	FRAME(0)
+	
+	# Calcula o primeiro pixel (superior esquerdo) ------------- #
+	get_first_pixel(%prev.column, %prev.line)
+	
+	# Calcula o último pixel (inferior direito) ---------------- #
+	get_left_last_pixel(t5)
+	
+	check_colision(t5)
 
-	j EXIT
+J_EXIT_a:
+		j EXIT
 	
 ACAO.d: # ANDAR DIREITA --------------------------------------------------- #
 	REFRESH(0)
 	addi %prev.column %prev.column, 4
 	PRINT_SPRITE_0(%prev.column, %prev.line, walk_1)
-	
-	# colisao_espinhos(%prev.column)
-	# colisao_buraco(%prev.column)
-	# final_tela(%prev.column)
 	
 	REFRESH(0)
 	addi %prev.column %prev.column 4
@@ -128,17 +148,13 @@ ACAO.d: # ANDAR DIREITA --------------------------------------------------- #
 	addi %prev.column %prev.column 4
 	PRINT_SPRITE_0(%prev.column, %prev.line, walk_8)
 	
-	mv s10, %prev.column
-	mv s11, %prev.line
+	check_win(%prev.column)	
 	
 	# Calcula o primeiro pixel (superior esquerdo) ------------- #
-	li t4, 320
-	mul t5, s11, t4
-	add t5, t5, s10
+	get_first_pixel(%prev.column, %prev.line)
 	
 	# Calcula o último pixel (inferior direito) ---------------- #
-	li t4, 0x000035CD
-	add t5, t5, t4
+	get_right_last_pixel(t5)
 	
 	check_colision(t5)
 	
@@ -177,71 +193,113 @@ ACAO.w: # PULAR ------------------------------------------------------------ #
 	SYSCALL(SLEEP)
 	addi %prev.line, %prev.line, 30
 	
-	# colisao_espinhos(%prev.column)
-	# colisao_buraco(%prev.column)
-	# final_tela(%prev.column)
+	# Calcula o primeiro pixel (superior esquerdo) ------------- #
+	get_first_pixel(%prev.column, %prev.line)
+	
+	# Calcula o último pixel (inferior direito) ---------------- #
+	get_right_last_pixel(t5)
+	
+	check_colision(t5)
 	
 	j EXIT
 	
 ACAO.q: # PULAR ESQUERDA ---------------------------------------------- #
+	
 	REFRESH(0)
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_1)
+	
 	li a0, 125
 	SYSCALL(SLEEP)
+	
+	li t4, -28
+	get_next_column(%prev.column, t4)
+	slti t5, t5, 0		# s1 = (pixel < 0) ? 1 : 0
+	bne t5, zero, J_EXIT_q
+	
 	REFRESH(0)
-	addi %prev.column, %prev.column, -36
+	addi %prev.column, %prev.column, -28
 	addi %prev.line, %prev.line, -30
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_2)
+	
 	li a0, 77
 	li a1, 500
 	li a2, 0
 	li a3, 100
 	li a7, 31
 	ecall
+	
 	li a0, 175
 	SYSCALL(SLEEP)
+	
+	li t4, -32
+	get_next_column(%prev.column, t4)
+	slti t5, t5, 0		# s1 = (pixel < 0) ? 1 : 0
+	bne t5, zero, J_EXIT_q
+	
 	REFRESH(0)
-	addi %prev.column, %prev.column, -36
+	addi %prev.column, %prev.column, -32
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_3)
+	
 	li a0, 50
 	li a1, 1000
 	li a2, 127
 	li a3, 100
 	li a7, 31
 	ecall
-	
+
 	REFRESH(0)
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_2)
+	
 	li a0, 150
 	SYSCALL(SLEEP)
+	
 	addi %prev.line, %prev.line, 30
 	
-	# colisao_espinhos(%prev.column)
-	# colisao_buraco(%prev.column)
-	# final_tela(%prev.column)
 	
+J_EXIT_q:	
+	li %prev.line, 0x0000009C
+
+	# Calcula o primeiro pixel (superior esquerdo) ------------- #
+	get_first_pixel(%prev.column, %prev.line)
+	
+	# Calcula o último pixel (inferior direito) ---------------- #
+	get_right_last_pixel(t5)
+	
+	check_colision(t5)
+
 	j EXIT
 
 ACAO.e: # PULAR DIREITA ------------------------------------------------------ #
+	
 	REFRESH(0)
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_1)
+	
 	li a0, 125
 	SYSCALL(SLEEP)
+	
+	check_win(%prev.column)
+	
 	REFRESH(0)
 	addi %prev.column, %prev.column, 36
 	addi %prev.line, %prev.line, -30
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_2)
+	
 	li a0, 77
 	li a1, 500
 	li a2, 0
 	li a3, 100
 	li a7, 31
 	ecall
+	
 	li a0, 175
 	SYSCALL(SLEEP)
+	
+	check_win(%prev.column)
+	
 	REFRESH(0)
 	addi %prev.column, %prev.column, 36
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_3)
+	
 	li a0, 50
 	li a1, 1000
 	li a2, 127
@@ -249,56 +307,27 @@ ACAO.e: # PULAR DIREITA ------------------------------------------------------ #
 	li a7, 31
 	ecall
 	
+	check_win(%prev.column)
+	
 	REFRESH(0)
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_2)
+	
 	li a0, 150
 	SYSCALL(SLEEP)
 	addi %prev.line, %prev.line, 30
 	
-	# colisao_espinhos(%prev.column)
-	# colisao_buraco(%prev.column)
-	# final_tela(%prev.column)
+	check_win(%prev.column)	
+	
+	# Calcula o primeiro pixel (superior esquerdo) ------------- #
+	get_first_pixel(%prev.column, %prev.line)
+	
+	# Calcula o último pixel (inferior direito) ---------------- #
+	get_right_last_pixel(t5)
+	
+	check_colision(t5)
 	
 	j EXIT
 
-ACAO.s: # DASH CIMA ------------------------------------------------------ #
-	REFRESH(0)
-	PRINT_SPRITE_0(%prev.column, %prev.line, run_1)
-	li a0, 125
-	SYSCALL(SLEEP)
-	REFRESH(0)
-	
-	addi %prev.line, %prev.line, -120
-	PRINT_SPRITE_0(%prev.column, %prev.line, run_2)
-	li a0, 77
-	li a1, 500
-	li a2, 0
-	li a3, 100
-	li a7, 31
-	ecall
-	li a0, 175
-	SYSCALL(SLEEP)
-	REFRESH(0)
-
-	PRINT_SPRITE_0(%prev.column, %prev.line, run_3)
-	li a0, 50
-	li a1, 1000
-	li a2, 127
-	li a3, 100
-	li a7, 31
-	ecall
-	
-	REFRESH(0)
-	PRINT_SPRITE_0(%prev.column, %prev.line, run_2)
-	li a0, 150
-	SYSCALL(SLEEP)
-	addi %prev.line, %prev.line, 120
-	
-	# colisao_espinhos(%prev.column)
-	# colisao_buraco(%prev.column)
-	# final_tela(%prev.column)
-	
-	j EXIT
 
 EXIT:
 	REFRESH(0)

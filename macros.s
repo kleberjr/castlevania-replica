@@ -242,25 +242,41 @@ DONE:
 
 
 
-.macro REFRESH(%alive, %frame)
+.macro REFRESH(%frame)
+	.data
+		.eqv FULL 100
+		.eqv HALF 50
+
 	.text
 		li t0, %frame
-		beqz t0, FRAME0
-		PRINT_FULL_IMG_1("./sprites/background/bg-life-100.bin")
-		beqz %alive DEAD
+		li t4, FULL
+		li t5, HALF
 		
-		# li t5 colunaI
-		# li t6 linhaI
-		# print_sprite1(t5, t6, invisivel)
-		# addi t5 t5 -16
-		# print_sprite1(t5, t6, invisivel)
+		beqz t0, CHECK_LIFE_0
+		j CHECK_LIFE_1
 		
-		j DEAD
+	CHECK_LIFE_0:
+		beq s8, t4, FULL_LIFE_0
+		beq s8, t5, HALF_LIFE_0
+		j EXIT
+	FULL_LIFE_0:	
+		PRINT_FULL_IMG_0("./sprites/background/bg-life-100.bin")
+		j EXIT		
+	HALF_LIFE_0:	
+		PRINT_FULL_IMG_0("./sprites/background/bg-life-50.bin")
+		j EXIT		
 	
-		FRAME0:	PRINT_FULL_IMG_0("./sprites/background/bg-life-100.bin")
-				beqz %alive DEAD
-				# print_sprite0(t5, t6, invisivel)
-		DEAD:
+	CHECK_LIFE_1:
+		beq s8, t4, FULL_LIFE_1
+		beq s8, t5, HALF_LIFE_1
+		j EXIT
+	FULL_LIFE_1:	
+		PRINT_FULL_IMG_1("./sprites/background/bg-life-100.bin")
+		j EXIT		
+	HALF_LIFE_1:	
+		PRINT_FULL_IMG_1("./sprites/background/bg-life-50.bin")
+	
+	EXIT:
 .end_macro
 
 
@@ -293,7 +309,15 @@ EXIT:
 
 
 .macro DECREASE_LIFE()
+.data
+	.include "./sprites/richard/stand_hit.data"
+.text
 	addi s8, s8, -50
+	
+	REFRESH(0)
+	PRINT_SPRITE_0(s10, s11, stand_hit)
+	REFRESH(0)
+	
 	bne s8, zero, EXIT
 	DEFEAT()
 	

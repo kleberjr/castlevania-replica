@@ -22,12 +22,12 @@
 # ------------------------- AÇÕES ----------------------------- #
 
 .macro walk(%l, %c)
-	REFRESH(s7, 0)
+	REFRESH(0)
 	FRAME(1)
 	PRINT_SPRITE_0(%l, %c, walk_1)
 	li a0, 300
 	SYSCALL(SLEEP)
-	REFRESH(s7,1)
+	REFRESH(1)
 	FRAME(0)
 .end_macro
 
@@ -72,7 +72,7 @@
 	
 			
 ACAO.a:	# ANDAR ESQUERDA ------------------------------------------------- #
-	REFRESH(s7,0)
+	REFRESH(0)
 	addi %prev.column %prev.column -4
 	PRINT_SPRITE_0(%prev.column, %prev.line, walk_1)
 	
@@ -80,27 +80,27 @@ ACAO.a:	# ANDAR ESQUERDA ------------------------------------------------- #
 	# colisao_buraco(%prev.column)
 	# final_tela(%prev.column)
 	
-	REFRESH(s7,1)
+	REFRESH(1)
 	FRAME(0)
 	addi %prev.column %prev.column -4
 	PRINT_SPRITE_1(%prev.column, %prev.line, walk_2)
 
-	REFRESH(s7,0)
+	REFRESH(0)
 	FRAME(1)
 	addi %prev.column %prev.column -4
 	PRINT_SPRITE_0(%prev.column, %prev.line, walk_3)
 
-	REFRESH(s7,1)
+	REFRESH(1)
 	FRAME(0)
 	addi %prev.column %prev.column -4
 	PRINT_SPRITE_1(%prev.column, %prev.line, walk_2)
-	REFRESH(s7,0)
+	REFRESH(0)
 	FRAME(1)
 
 	j EXIT
 	
 ACAO.d: # ANDAR DIREITA --------------------------------------------------- #
-	REFRESH(s7, 0)
+	REFRESH(0)
 	addi %prev.column %prev.column, 4
 	PRINT_SPRITE_0(%prev.column, %prev.line, walk_1)
 	
@@ -108,23 +108,23 @@ ACAO.d: # ANDAR DIREITA --------------------------------------------------- #
 	# colisao_buraco(%prev.column)
 	# final_tela(%prev.column)
 	
-	REFRESH(s7,0)
+	REFRESH(0)
 	addi %prev.column %prev.column 4
 	PRINT_SPRITE_0(%prev.column, %prev.line, walk_3)
 
-	REFRESH(s7,0)
+	REFRESH(0)
 	addi %prev.column %prev.column 4
 	PRINT_SPRITE_0(%prev.column, %prev.line, walk_4)
 	
-	REFRESH(s7,0)
+	REFRESH(0)
 	addi %prev.column %prev.column 4
 	PRINT_SPRITE_0(%prev.column, %prev.line, walk_5)
 	
-	REFRESH(s7,0)
+	REFRESH(0)
 	addi %prev.column %prev.column 4
 	PRINT_SPRITE_0(%prev.column, %prev.line, walk_7)	
 	
-	REFRESH(s7,0)
+	REFRESH(0)
 	addi %prev.column %prev.column 4
 	PRINT_SPRITE_0(%prev.column, %prev.line, walk_8)
 	
@@ -137,7 +137,7 @@ ACAO.d: # ANDAR DIREITA --------------------------------------------------- #
 	add t5, t5, s10
 	
 	# Calcula o último pixel (inferior direito) ---------------- #
-	li t4, 0x000035D7
+	li t4, 0x000035CD
 	add t5, t5, t4
 	
 	check_colision(t5)
@@ -145,11 +145,11 @@ ACAO.d: # ANDAR DIREITA --------------------------------------------------- #
 	j EXIT	
 	
 ACAO.w: # PULAR ------------------------------------------------------------ #
-	REFRESH(s7, 0)
+	REFRESH(0)
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_1)
 	li a0, 125
 	SYSCALL(SLEEP)
-	REFRESH(s7, 0)
+	REFRESH(0)
 
 	addi %prev.line, %prev.line, -30
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_2)
@@ -161,7 +161,7 @@ ACAO.w: # PULAR ------------------------------------------------------------ #
 	ecall
 	li a0, 175
 	SYSCALL(SLEEP)
-	REFRESH(s7, 0)
+	REFRESH(0)
 
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_3)
 	li a0, 50
@@ -171,7 +171,7 @@ ACAO.w: # PULAR ------------------------------------------------------------ #
 	li a7, 31
 	ecall
 	
-	REFRESH(s7, 0)
+	REFRESH(0)
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_2)
 	li a0, 150
 	SYSCALL(SLEEP)
@@ -184,11 +184,11 @@ ACAO.w: # PULAR ------------------------------------------------------------ #
 	j EXIT
 	
 ACAO.q: # PULAR ESQUERDA ---------------------------------------------- #
-	REFRESH(s7, 0)
+	REFRESH(0)
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_1)
 	li a0, 125
 	SYSCALL(SLEEP)
-	REFRESH(s7, 0)
+	REFRESH(0)
 	addi %prev.column, %prev.column, -36
 	addi %prev.line, %prev.line, -30
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_2)
@@ -200,7 +200,7 @@ ACAO.q: # PULAR ESQUERDA ---------------------------------------------- #
 	ecall
 	li a0, 175
 	SYSCALL(SLEEP)
-	REFRESH(s7, 0)
+	REFRESH(0)
 	addi %prev.column, %prev.column, -36
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_3)
 	li a0, 50
@@ -210,7 +210,7 @@ ACAO.q: # PULAR ESQUERDA ---------------------------------------------- #
 	li a7, 31
 	ecall
 	
-	REFRESH(s7, 0)
+	REFRESH(0)
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_2)
 	li a0, 150
 	SYSCALL(SLEEP)
@@ -223,11 +223,11 @@ ACAO.q: # PULAR ESQUERDA ---------------------------------------------- #
 	j EXIT
 
 ACAO.e: # PULAR DIREITA ------------------------------------------------------ #
-	REFRESH(s7, 0)
+	REFRESH(0)
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_1)
 	li a0, 125
 	SYSCALL(SLEEP)
-	REFRESH(s7, 0)
+	REFRESH(0)
 	addi %prev.column, %prev.column, 36
 	addi %prev.line, %prev.line, -30
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_2)
@@ -239,7 +239,7 @@ ACAO.e: # PULAR DIREITA ------------------------------------------------------ #
 	ecall
 	li a0, 175
 	SYSCALL(SLEEP)
-	REFRESH(s7, 0)
+	REFRESH(0)
 	addi %prev.column, %prev.column, 36
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_3)
 	li a0, 50
@@ -249,7 +249,7 @@ ACAO.e: # PULAR DIREITA ------------------------------------------------------ #
 	li a7, 31
 	ecall
 	
-	REFRESH(s7, 0)
+	REFRESH(0)
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_2)
 	li a0, 150
 	SYSCALL(SLEEP)
@@ -262,11 +262,11 @@ ACAO.e: # PULAR DIREITA ------------------------------------------------------ #
 	j EXIT
 
 ACAO.s: # DASH CIMA ------------------------------------------------------ #
-	REFRESH(s7, 0)
+	REFRESH(0)
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_1)
 	li a0, 125
 	SYSCALL(SLEEP)
-	REFRESH(s7, 0)
+	REFRESH(0)
 	
 	addi %prev.line, %prev.line, -120
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_2)
@@ -278,7 +278,7 @@ ACAO.s: # DASH CIMA ------------------------------------------------------ #
 	ecall
 	li a0, 175
 	SYSCALL(SLEEP)
-	REFRESH(s7, 0)
+	REFRESH(0)
 
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_3)
 	li a0, 50
@@ -288,7 +288,7 @@ ACAO.s: # DASH CIMA ------------------------------------------------------ #
 	li a7, 31
 	ecall
 	
-	REFRESH(s7, 0)
+	REFRESH(0)
 	PRINT_SPRITE_0(%prev.column, %prev.line, run_2)
 	li a0, 150
 	SYSCALL(SLEEP)
@@ -301,9 +301,9 @@ ACAO.s: # DASH CIMA ------------------------------------------------------ #
 	j EXIT
 
 EXIT:
-	REFRESH(s7, 0)
+	REFRESH(0)
 	PRINT_SPRITE_0(%prev.column, %prev.line, stand)
-	REFRESH(s7, 1)
+	REFRESH(1)
 	FRAME(0)
 
 .end_macro

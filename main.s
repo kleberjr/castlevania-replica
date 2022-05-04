@@ -1,21 +1,14 @@
 # ============================= INLCUDES =============================== # 
 .include "macros.s"
 .include "MACROSv21.s"
+.include "movement.s"
 # ====================================================================== #
 
 .data
 
 .text
-	
-	
 
 # MENU --------------------------------------------------------------------------- #
-	li s10, 12			# s10 recebe o valor da coluna onde se quer imprimir.
-	li s11, 130			# s11 recebe o valor da linha onde se quer imprimir.
-	li s7, 2
-	PRINT_SPRITE_0(s10, s11, "./sprites/richard/walk-1.data")
-	
-	
 	PRINT_MENU()			# Printa o menu.
 	li s0, MMIO_CTRL		# s0 recebe o endereço onde o bit de controle do teclado está armazenado.
 	sw zero, 0(s0)			# Limpa o bit de controle, evitando que qualquer tecla pressionada antes da execução seja interpretada.
@@ -67,12 +60,26 @@ ENTRANCE2_LOOP:
 	j ENTRANCE2_LOOP			# Loop infinito até que 'f' seja pressionado.
 FIM_ENTRANCE2:
 
-	PRINT_FULL_IMG("./sprites/background/bg-life-100.bin")
-	
-	li s10, 0			# s10 recebe o valor da coluna onde se quer imprimir.
-	li s11, 0			# s11 recebe o valor da linha onde se quer imprimir.
-	PRINT_SPRITE_0(zero, zero, "./sprites/richard/walk-1.data")
 
-	SYSCALL(EXIT1)
+# JOGO COMEÇA ---------------------------------------------------------------------------- #
+	li s7, 2			# Indica que o jogador está vivo.
+	li s8, 100			# Indica que a vida do jogador está cheia
+	li s10, 0
+	li s11, 156
+
+POOL_LOOP:
+	lb t1, 0(s0)		# t1 recebe o bit de controle (1 = teclado quer mandar um dado, 0 = teclado não quer mandar um dado)
+
+PULEI:	beqz t1, POOL_LOOP		# Reinicia o loop caso t1 = 0 (caso o teclado não queira mandar nenhum dado).
+		li a0, MMIO_BUFFER		# a0 recebe o endereço onde o valor ASCII da tecla pressionada está guardado.
+		lw a0, 0(a0)			# Instrução necessária para que o dado não se perca.
+
+		# a0 contém o valor ASCII do caractere agora.					
+		
+		ACTION(a0, s10, s11)
+		j POOL_LOOP				# Loop infinito do teclado.
 	
+EXIT:
+	SYSCALL(EXIT1)		# Finaliza a execução do programa.
+
 .include "SYSTEMv21.s"
